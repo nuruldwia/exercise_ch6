@@ -3,6 +3,32 @@ const prisma = new PrismaClient();
 const imagekit = require('../libs/imagekit');
 
 module.exports = {
+    createProfile: async (req, res, next) => {
+        try {
+            let { userId } = req.user;
+            let { first_name, last_name, birth_date } = req.body;
+            let profile_picture = req.file;
+
+            let userprofile = await prisma.userProfile.create({
+                data: {
+                    userId,
+                    first_name,
+                    last_name,
+                    birth_date,
+                    profile_picture
+                }
+            });
+
+            res.status(201).json({
+                status: true,
+                message: "User profile created!",
+                data: userprofile
+            });
+        } catch (err) {
+            next(err);
+        }
+    },
+
     updateProfile: async (req, res, next) => {
         try {
             let { first_name, last_name, birth_date } = req.body;
