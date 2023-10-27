@@ -1,12 +1,14 @@
-const prisma = require('../libs/prisma');
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
 const imagekit = require('../libs/imagekit');
 
 module.exports = {
     updateProfile: async (req, res, next) => {
         try {
             let { first_name, last_name, birth_date } = req.body;
+            let { profile_picture } = req.file;
 
-            if (!req.file) {
+            if (profile_picture) {
                 return res.status(400).json({
                     status: false,
                     message: 'missing file',
@@ -36,19 +38,11 @@ module.exports = {
                 },
                 data: {
                     profile: {
-                        upsert: {
-                            create: {
-                                first_name,
-                                last_name,
-                                birth_date: new Date(birth_date).toISOString(),
-                                profile_picture: url,
-                             },
-                            update: {
-                                first_name,
-                                last_name,
-                                birth_date: new Date(birth_date).toISOString(),
-                                profile_picture: url,
-                            },
+                        update: {
+                            first_name,
+                            last_name,
+                            birth_date: new Date(birth_date).toISOString(),
+                            profile_picture: url,
                         },
                     },
                 },
